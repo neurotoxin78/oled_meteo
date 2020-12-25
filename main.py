@@ -12,6 +12,7 @@ sensor = SENSOR()
 while KeyboardInterrupt:
     ui.set_free_mem_text(mem_free(), TOMATO)
     ui.set_temp_value(sensor.temperature, AZURE)
-    ui.set_humidity_value(sensor.humidity, DODGERBLUE)    
+    ui.set_humidity_value(sensor.humidity, DODGERBLUE)
+    ui.set_pressure_value(sensor.pressure, GAINSBORO) 
     collect()
     sleep(0.1)
