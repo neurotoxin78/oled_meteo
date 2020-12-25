@@ -1,7 +1,6 @@
 from st7735s import ST7735
 import label
 
-
 class UserInterface(object):
     """docstring for ."""
 
@@ -30,4 +29,4 @@ class UserInterface(object):
         self.temp_value.set_text(str(text), color=color)
 
     def set_humidity_value(self, text, color):
-        self.humi_value.set_text(str(text), color=color)    
+        self.humi_value.set_text(str(text), color=color)
