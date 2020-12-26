@@ -120,3 +120,6 @@ class UserInterface(object):
     def humi_label(self, text, color):
         self.tft.font(self.tft.FONT_DejaVu24, rotate=0)
         self.tft.text(95, 10, str(text), color, transparent=False)
+    def pres_label(self, text, color):
+        self.tft.font(self.tft.FONT_Ubuntu, rotate=0)
+        self.tft.text(5, 45, str(text), color, transparent=False)
