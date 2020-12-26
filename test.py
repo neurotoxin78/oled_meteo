@@ -1,7 +1,7 @@
-from machine import Pin
-from time import sleep_ms
-import display
+import machine, display, time
 from micropython import const
+
+tft_rst = machine.Pin(4, machine.Pin.OUT, 1)
 
 # command definitions
 CMD_NOP = const(0x00)  # No Operation
@@ -41,21 +41,20 @@ CMD_VMCTR1 = const(0xC5)  # VCOM control
 CMD_GMCTRP1 = const(0xE0)
 CMD_GMCTRN1 = const(0xE1)
 
-tft_rst = Pin(4, Pin.OUT, 1)
-
+#------------------
 def tft_init(disp):
     # Reset
     tft_rst.value(0)
-    sleep_ms(120)
+    time.sleep_ms(120)
     tft_rst.value(1)
     madctl_params = 0b10100000
     for cmd, data, delay in [
         (CMD_SWRESET, None, 150),
         (CMD_SLPOUT, None, 500),
-        (CMD_FRMCTR1, b"\x01\x2c\x2d", None),
-        (CMD_FRMCTR2, b"\x01\x2c\x2d", None),
-        (CMD_FRMCTR3, b"\x01\x2c\x2d\x01\x2c\x2d", None),
-        (CMD_INVCTR, b"\x07", None),
+        #(CMD_FRMCTR1, b"\x01\x2c\x2d", None),
+        #(CMD_FRMCTR2, b"\x01\x2c\x2d", None),
+        #(CMD_FRMCTR3, b"\x01\x2c\x2d\x01\x2c\x2d", None),
+        #(CMD_INVCTR, b"\x07", None),
         (CMD_PWCTR1, b"\xa2\x02\x84", None),
         (CMD_PWCTR2, b"\xc5", None),
         (CMD_PWCTR3, b"\x0a\x00", None),
@@ -80,43 +79,35 @@ def tft_init(disp):
             disp.tft_writecmd(cmd)
         if delay:
             #print(delay)
-            sleep_ms(delay)
+            time.sleep_ms(delay)
     disp.tft_writecmd(CMD_SLPOUT)
-    sleep_ms(120)
+    time.sleep_ms(120)
     disp.tft_writecmd(CMD_DISPON)
 
-class UserInterface(object):
-    """docstring for UserInterfa"""
 
-    def __init__(self):
-        self.tft = display.TFT()
-        self.tft.init(self.tft.GENERIC, width=162, height=120, miso=19, mosi=23, clk=18, cs=2, dc=5, bgr=True)
-        tft_init(self.tft)
-        fontnames = (
-            self.tft.FONT_Default,
-            self.tft.FONT_7seg,
-            self.tft.FONT_Ubuntu,
-            self.tft.FONT_Comic,
-            self.tft.FONT_Tooney,
-            self.tft.FONT_Minya,
-            self.tft.FONT_DejaVu18,
-            self.tft.FONT_DejaVu24,
-            self.tft.FONT_DefaultSmall,
-            self.tft.FONT_Small,
-        )
-        self.maxx, self.maxy = self.tft.screensize()
-        self.tft.resetwin()
-        self.tft.setwin(0, 25, self.maxx + 3, self.maxy)
-        self.tft.rect(0, 0, self.maxx, self.maxy, self.tft.OLIVE, self.tft.BLACK)# print display header
-        #self.tft.font(self.tft.FONT_Default, rotate=0)
-        #self.tft.text(self.tft.CENTER, 5, "Meteo Station", self.tft.ORANGE, transparent=True)
-
-    def mem_free_label(self, text, color):
-        self.tft.font(self.tft.FONT_Default, rotate=0)
-        self.tft.text(5, 67, 'RAM: ' + str(text) + ' free', color, transparent=False)
-    def temp_label(self, text, color):
-        self.tft.font(self.tft.FONT_DejaVu24, rotate=0)
-        self.tft.text(10, 10, str(text), color, transparent=False)
-    def humi_label(self, text, color):
-        self.tft.font(self.tft.FONT_DejaVu24, rotate=0)
-        self.tft.text(95, 10, str(text), color, transparent=False)
+tft = display.TFT()
+# Init display with GENERIC type, the display will not be initialized
+# This, for example, works for M5Stack display
+tft.init(tft.GENERIC, width=160, height=120, miso=19, mosi=23, clk=18, cs=2, dc=5, bgr=False)
+# Initialize the display
+tft_init(tft)
+miny = 10
+# fonts used in this demo
+fontnames = (
+    tft.FONT_Default,
+    tft.FONT_7seg,
+    tft.FONT_Ubuntu,
+    tft.FONT_Comic,
+    tft.FONT_Tooney,
+    tft.FONT_Minya
+)
+maxx, maxy = tft.screensize()
+tft.clearwin()
+tft.clear()
+tft.resetwin()
+tft.setwin(0, 25, maxx + 3, maxy)
+tft.rect(0, 0, maxx, maxy, tft.OLIVE, tft.BLACK)# print display header
+tft.font(tft.FONT_Comic, rotate=0)
+tft.text(tft.CENTER, 5, "Hello World", tft.ORANGE, transparent=True)
+print(tft.winsize())
+#tft.resetwin()
